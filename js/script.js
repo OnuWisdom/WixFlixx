@@ -2,6 +2,7 @@ const global = {
 	currentPage: window.location.pathname,
 };
 
+// Function to display popular movies on the home page
 async function displayPopularMovies() {
 	const { results } = await fetchApiData('movie/popular');
 	results.forEach((movie) => {
@@ -29,6 +30,37 @@ async function displayPopularMovies() {
 					</div>
 		`;
 		document.querySelector('#popular-movies').appendChild(movieCard);
+	});
+}
+
+// Function to display popular TV shows on the home page
+async function displayPopularShow() {
+	const { results } = await fetchApiData('tv/popular');
+	results.forEach((show) => {
+		const showsCard = document.createElement('div');
+		showsCard.classList.add('card');
+		showsCard.innerHTML = `
+					<a href="tv-details.html?id=${show.id} ">
+
+						${
+							show.poster_path
+								? `<img
+							src="https://image.tmdb.org/t/p/w500${show.poster_path}" 
+							class="card-img-top"
+							alt="${show.name}" />`
+								: `<img
+							src="images/no-image.jpg" class="card-img-top" 
+							alt="${show.name}" />`
+						}
+					</a>
+					<div class="card-body">
+						<h5 class="card-title">${show.name}</h5>
+						<p class="card-text">
+							<small class="text-muted">Air Date: ${show.first_air_date} </small>
+						</p>
+					</div>
+		`;
+		document.querySelector('#popular-shows').appendChild(showsCard);
 	});
 }
 
@@ -78,7 +110,7 @@ function Init() {
 			displayPopularMovies();
 			break;
 		case '/shows.html':
-			console.log('Shows Page');
+			displayPopularShow();
 			break;
 		case '/movie-details.html':
 			console.log('Movies Page');
