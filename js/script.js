@@ -24,7 +24,7 @@ async function displayPopularMovies() {
 					<div class="card-body">
 						<h5 class="card-title">${movie.title}</h5>
 						<p class="card-text">
-							<small class="text-muted">Release:${movie.release_date} </small>
+							<small class="text-muted">Release: ${movie.release_date} </small>
 						</p>
 					</div>
 		`;
@@ -37,11 +37,24 @@ async function fetchApiData(endpoint) {
 	const API_KEY = '78e8755edca9e4310b6148170aed5c4f';
 	const API_URL = 'https://api.themoviedb.org/3/';
 
+	showSpinner();
+
 	const res = await fetch(
 		`${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US`
 	);
 	const data = await res.json();
+
+	hideSpinner();
 	return data;
+}
+
+// Function to show spinner
+function showSpinner() {
+	document.querySelector('.spinner').classList.add('show');
+}
+
+function hideSpinner() {
+	document.querySelector('.spinner').classList.remove('show');
 }
 
 // Highlight Active Links
