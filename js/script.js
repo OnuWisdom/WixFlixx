@@ -220,6 +220,57 @@ function displayBackgroundImage(type, backdropPath) {
 	}
 }
 
+// Display Slider for popular movies
+async function displaySlider() {
+	const { results } = await fetchApiData('movie/now_playing');
+	const sliderContainer = document.querySelector('.swiper-wrapper');
+
+	results.forEach((movie) => {
+		const slide = document.createElement('div');
+		slide.classList.add('swiper-slide');
+		slide.innerHTML = `
+			<a href="movie-details.html?id=${movie.id}">
+				${
+					movie.poster_path
+						? `<img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" />`
+						: `<img src="images/no-image.jpg" alt="${movie.title}" />`
+				}
+			</a>
+						<h4 class="swiper-rating">
+							<i class="fas fa-star text-secondary"></i> ${movie.vote_average} / 10
+						</h4>
+		`;
+		sliderContainer.appendChild(slide);
+
+		initSwiper();
+	});
+}
+
+// Initialize Swiper for the slider
+function initSwiper() {
+	const swiper = new Swiper('.swiper', {
+		slidesPerView: 1,
+		spaceBetween: 30,
+		freeMode: true,
+		loop: true,
+		autoplay: {
+			delay: 1000, // Delay between slides
+			disableOnInteraction: false, // Continue autoplay after user interaction
+		},
+		breakpoints: {
+			500: {
+				slidesPerView: 2, // Show 2 slides on small screens
+			},
+			700: {
+				slidesPerView: 3, // Show 3 slides on medium screens
+			},
+			1200: {
+				slidesPerView: 4, // Show 4 slides on large screens
+			},
+		},
+	});
+}
+
 // Fetch data from TMDB API
 async function fetchApiData(endpoint) {
 	const API_KEY = '78e8755edca9e4310b6148170aed5c4f';
@@ -263,6 +314,7 @@ function Init() {
 		case '/':
 		case '/index.html':
 			// Home page initialization
+			displaySlider();
 			displayPopularMovies();
 			break;
 		case '/shows.html':
