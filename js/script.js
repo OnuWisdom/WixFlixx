@@ -67,7 +67,6 @@ async function displayPopularShow() {
 // Display Movie details on the movie details page
 async function displayMovieDetails() {
 	const movieId = new URLSearchParams(window.location.search).get('id');
-	console.log(movieId);
 
 	const movie = await fetchApiData(`movie/${movieId}`);
 	const div = document.createElement('div');
@@ -127,6 +126,76 @@ async function displayMovieDetails() {
 	`;
 
 	document.querySelector('#movie-details').appendChild(div);
+}
+
+// Display Shows details on the movie details page
+async function displayShowDetails() {
+	const showId = new URLSearchParams(window.location.search).get('id');
+	console.log(showId);
+
+	const show = await fetchApiData(`tv/${showId}`);
+	console.log(show);
+	const div = document.createElement('div');
+
+	// Overlay the movie images
+	displayBackgroundImage('show', show.backdrop_path);
+
+	div.innerHTML = ` 
+	<div class="details-top">
+					<div>
+					${
+						show.poster_path
+							? `<img
+						src="https://image.tmdb.org/t/p/w500${show.poster_path}" 
+						class="card-img-top"
+						alt="${show.name}" />`
+							: `<img
+						src="images/no-image.jpg" class="card-img-top" 
+						alt="${show.name}" />`
+					}
+					</div>
+					<div>
+						<h2>${show.name} </h2>
+						<p>
+							<i class="fas fa-star text-primary"></i>
+							${show.vote_average.toFixed(1)} / 10
+						</p>
+						<p class="text-muted">Last Air Date: ${show.last_air_date} </p>
+						<p>
+							${show.overview}
+						</p>
+						<h5>Genres</h5>
+						<ul class="list-group">
+							${show.genres.map((genre) => `<li>${genre.name}</li>`).join('')}
+						</ul>
+						<a href="${show.homepage} " target="_blank" class="btn">Visit Movie Homepage</a>
+					</div>
+				</div>
+				<div class="details-bottom">
+					<h2>Show Info</h2>
+					<ul>
+						<li><span class="text-secondary">Number of Episodes</span>${
+							show.number_of_episodes
+						} </li>
+						<li><span class="text-secondary">Last Episode to air:</span>  ${
+							show.last_episode_to_air.name
+						}</li>
+						<li><span class="text-secondary">Number of Seasons:</span> ${
+							show.number_of_seasons
+						} </li>
+						<li><span class="text-secondary">Status:</span> ${show.status}</li>
+					</ul>
+					<h4>Production Companies</h4>
+					<div class="list-group">${show.production_companies
+						.map(
+							(company) =>
+								`<span class="list-group-item">${company.name}</span>`
+						)
+						.join('')} </div>
+				</div>
+	`;
+
+	document.querySelector('#show-details').appendChild(div);
 }
 
 // Function to display background image for movie or TV show details
@@ -203,7 +272,7 @@ function Init() {
 			displayMovieDetails();
 			break;
 		case '/tv-details.html':
-			console.log('TV Shows Page');
+			displayShowDetails();
 			break;
 		case '/search.html':
 			console.log('Search Page');
