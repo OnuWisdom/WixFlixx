@@ -238,52 +238,55 @@ async function search() {
 
 	if (global.search.term !== '' && global.search.term !== null) {
 		// Make Search request
-		const results = await searchApiData();
-		console.log(results);
+		const { results, total_pages, page } = await searchApiData();
+
+		if (results.length === 0) {
+			showAlert('No results found', 'error');
+			document.querySelector('#search-results').innerHTML = '';
+			return;
+		}
+
+		displaySearchResults(results);
+
+		document.querySelector('#search-term').value = '';
 	} else {
-		showAlert('Please enter a search term');
+		showAlert('Please enter a search term', 'error');
 	}
+}
 
-	// console.log(query);
-	// if (!query) {
-	// 	document.querySelector('#search-results').innerHTML =
-	// 		'<h2>Please enter a search term</h2>';
-	// 	return;
-	// }
+function displaySearchResults(results) {
+	const searchResultsContainer = document.querySelector('#search-results');
+	searchResultsContainer.innerHTML = '';
 
-	// const { results } = await fetchApiData(`search/multi?query=${query}`);
-	// if (results.length === 0) {
-	// 	document.querySelector('#search-results').innerHTML =
-	// 		'<h2>No results found</h2>';
-	// 	return;
-	// }
-
-	// results.forEach((item) => {
-	// 	const card = document.createElement('div');
-	// 	card.classList.add('card');
-	// 	card.innerHTML = `
-	// 		<a href="${
-	// 			item.media_type === 'movie' ? 'movie-details.html' : 'tv-details.html'
-	// 		}?id=${item.id}">
-	// 			${
-	// 				item.poster_path
-	// 					? `<img src="https://image.tmdb.org/t/p/w500${
-	// 							item.poster_path
-	// 					  }" class="card-img-top" alt="${item.title || item.name}" />`
-	// 					: `<img src="images/no-image.jpg" class="card-img-top" alt="${
-	// 							item.title || item.name
-	// 					  }" />`
-	// 			}
-	// 		</a>
-	// 		<div class="card-body">
-	// 			<h5 class="card-title">${item.title || item.name}</h5>
-	// 			<p class="card-text">
-	// 				<small class="text-muted">${item.release_date || item.first_air_date}</small>
-	// 			</p>
-	// 		</div>
-	// 	`;
-	// 	document.querySelector('#search-results').appendChild(card);
-	// });
+	results.forEach((result) => {
+		const card = document.createElement('div');
+		card.classList.add('card');
+		card.innerHTML = `
+			<a href="${global.search.type}-details.html?id=${result.id}">
+				${
+					result.poster_path
+						? `<img src="https://image.tmdb.org/t/p/w500${
+								result.poster_path
+						  }" class="card-img-top" alt="${
+								global.search.type === 'movie' ? result.title : result.name
+						  }" />`
+						: `<img src="images/no-image.jpg" class="card-img-top" alt="${
+								global.search.type === 'movie' ? result.title : result.name
+						  }" />`
+				}
+			</a>
+			<div class="card-body">
+				<h5 class="card-title">${result.title || result.name}</h5>
+				<p class="card-text">
+					<small class="text-muted"> Release:
+						${global.search.type === 'movie' ? result.release_date : result.first_air_date}
+					</small>
+				</p>
+				
+			</div>
+		`;
+		searchResultsContainer.appendChild(card);
+	});
 }
 
 // Display Slider for popular movies
