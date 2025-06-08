@@ -260,6 +260,11 @@ async function search() {
 }
 
 function displaySearchResults(results) {
+	// Clear previous search results
+	document.querySelector('#pagination').innerHTML = '';
+	document.querySelector('#search-results-heading').innerHTML = '';
+	document.querySelector('#search-results').innerHTML = '';
+
 	const searchResultsContainer = document.querySelector('#search-results');
 	searchResultsContainer.innerHTML = '';
 
@@ -300,6 +305,52 @@ function displaySearchResults(results) {
 	});
 
 	displayPagination();
+}
+
+// Display pagination for search results
+function displayPagination() {
+	const div = document.createElement('div');
+	div.classList.add('pagination');
+	div.innerHTML = ` 
+				<button class="btn btn-primary" id="prev">Prev</button>
+					<button class="btn btn-primary" id="next">Next</button>
+					<div class="page-counter">Page ${global.search.page} of ${global.search.totalPages} </div>
+	`;
+
+	document.querySelector('#pagination').appendChild(div);
+
+	// Add event listeners for pagination buttons
+
+	document.querySelector('#prev').addEventListener('click', async () => {
+		if (global.search.page > 1) {
+			global.search.page--;
+			const { results, total_pages } = await searchApiData();
+			displaySearchResults(results);
+		}
+	});
+
+	// Add event listener for next button
+	document.querySelector('#next').addEventListener('click', async () => {
+		if (global.search.page < global.search.totalPages) {
+			global.search.page++;
+			const { results, total_pages } = await searchApiData();
+			displaySearchResults(results);
+		}
+	});
+
+	// Disable previous button if on first page
+	if (global.search.page === 1) {
+		document.querySelector('#prev').disabled = true;
+	} else {
+		document.querySelector('#prev').disabled = false;
+	}
+
+	// Disable next button if on last page
+	if (global.search.page === global.search.totalPages) {
+		document.querySelector('#next').disabled = true;
+	} else {
+		document.querySelector('#next').disabled = false;
+	}
 }
 
 // Display Slider for popular movies
@@ -377,7 +428,7 @@ async function searchApiData() {
 	showSpinner();
 
 	const res = await fetch(
-		`${API_URL}search/${global.search.type}?api_key=${API_KEY}&language=en-US&query=${global.search.term}`
+		`${API_URL}search/${global.search.type}?api_key=${API_KEY}&language=en-US&query=${global.search.term}&page=${global.search.page}`
 	);
 	const data = await res.json();
 	hideSpinner();
