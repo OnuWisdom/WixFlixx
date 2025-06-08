@@ -5,6 +5,7 @@ const global = {
 		type: '',
 		page: 1,
 		totalPages: 1,
+		totalResults: 0,
 	},
 	api: {
 		key: '78e8755edca9e4310b6148170aed5c4f',
@@ -238,7 +239,11 @@ async function search() {
 
 	if (global.search.term !== '' && global.search.term !== null) {
 		// Make Search request
-		const { results, total_pages, page } = await searchApiData();
+		const { results, total_pages, page, total_results } = await searchApiData();
+
+		global.search.page = page;
+		global.search.totalPages = total_pages;
+		global.search.totalResults = total_results;
 
 		if (results.length === 0) {
 			showAlert('No results found', 'error');
@@ -285,8 +290,16 @@ function displaySearchResults(results) {
 				
 			</div>
 		`;
+
+		document.querySelector('#search-results-heading').innerHTML = `
+		
+			<h2>${results.length} of ${global.search.totalResults} results for ${global.search.term} </h2>
+			`;
+
 		searchResultsContainer.appendChild(card);
 	});
+
+	displayPagination();
 }
 
 // Display Slider for popular movies
